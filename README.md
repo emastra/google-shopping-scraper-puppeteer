@@ -12,8 +12,8 @@ Google Shopping Scraper is an [Apify actor](https://apify.com/actors) for extrac
 
 | Field | Type | Description |
 | ----- | ---- | ----------- |
-| queries | Array of Strings | (Required if you don't use `Input URL`) List of queries to search for |
-| queries | Array of Strings | (Required if you don't use `Search Queries`) Here you can provide a list of search URLs. |
+| queries | Array of Strings | (Required if you don't use `inputUrl`) List of queries to search for |
+| inputUrl | Array of Strings | (Required if you don't use `queries`) Here you can provide a list of search URLs. |
 | countryCode | String | (required) Provide the country to search in (choose from the country list when using the editor, provide the country code when using JSON) |
 | maxPostCount | Integer | Limit of the results to be scraped per page, 0 means no limit. Currently the actor scrapes only the 1st page (20 results) |
 | isAdvancedResults | Boolean | Check this if you want to scrape more data. Your dataset items will have more fields including `merchantName` and `reviews` |
@@ -88,4 +88,4 @@ The following example will add a new field:
 Expected compute units is 0.394 every 10 products.
 
 ### Open an issue
-If you find any bug, please create an issue on the actor [Github page](https://github.com/emastra/google-shopping-scraper).
+If you find any bug, please create an issue on the actor [Github page](https://github.com/emastra/google-shopping-scraper-puppeteer).
