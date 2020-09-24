@@ -176,9 +176,10 @@ Apify.main(async () => {
                         }
                     }
 
-                    // TODO: Not sure why is this commented, fix it
-                    // if extended output fnction exists, apply it now.
-                    // if (evaledFunc) item = await applyFunction($, evaledFunc, item);
+
+                    if (evaledFunc) {
+                        item = await applyFunction(page, evaledFunc, item);
+                    }
 
                     await Apify.pushData(item);
                     log.info(`${item.productName} item pushed.`);

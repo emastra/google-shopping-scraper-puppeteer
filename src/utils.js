@@ -19,26 +19,34 @@ function checkAndEval(extendOutputFunction) {
     return evaledFunc;
 }
 
-async function applyFunction($, evaledFunc, items) {
+async function applyFunction(page, extendOutputFunction, item) {
     const isObject = val => typeof val === 'object' && val !== null && !Array.isArray(val);
 
-    let userResult = {};
-    try {
-        userResult = await evaledFunc($);
-    } catch (err) {
-        log.error(`extendOutputFunction crashed! Pushing default output. Please fix your function if you want to update the output. Error: ${err}`);
+    const pageFunctionString = extendOutputFunction.toString();
+
+    const evaluatePageFunction = async (fnString) => {
+        const fn = eval(fnString);
+        try {
+            const result = await fn($);
+            return { result };
+        } catch (e) {
+            return { error: e.toString()} ;
+        }
+    };
+
+    await Apify.utils.puppeteer.injectJQuery(page);
+    const { result, error } = await page.evaluate(evaluatePageFunction, pageFunctionString);
+    if (error) {
+        console.log(`extendOutputFunctionfailed. Returning default output. Error: ${error}`);
+        return item;
     }
 
-    if (!isObject(userResult)) {
+    if (!isObject(result)) {
         log.exception(new Error('extendOutputFunction must return an object!'));
         process.exit(1);
     }
 
-    items.forEach((item, i) => {
-        items[i] = { ...item, ...userResult };
-    });
-
-    return items;
+    return { ...item, ...result };
 }
 
 function countryCodeToGoogleHostname(countryCode) {
