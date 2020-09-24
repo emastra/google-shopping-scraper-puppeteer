@@ -18,7 +18,7 @@ Apify.main(async () => {
     const {
         queries = null,
         inputUrl = null,
-        countryCode,
+        countryCode = 'us',
         maxPostCount,
         isAdvancedResults,
         extendOutputFunction = null,

@@ -20,10 +20,10 @@
             "title": "Country",
             "type": "string",
             "description": "Country determines the IP address of the proxy used for the query and the Google Shopping domain (e.g. <code>google.es</code> for Spain). <br><br>This setting only applies to <strong>Search queries</strong>, but not to <strong>URLs</strong>.",
-            "default": "",
+            "default": "us",
             "editor": "select",
             "enum": [
-                "",
+                "us",
                 "af",
                 "al",
                 "dz",
@@ -529,6 +529,5 @@
             "prefill": "($) => {\n    const result = {};\n    // Uncomment to modify the title of each item of the output\n    // result.title = 'Test Title';\n\n    return result;\n}",
             "sectionCaption": "Advanced options"
         }
-    },
-    "required": ["countryCode"]
+    }
 }
