@@ -1,6 +1,7 @@
 const Apify = require('apify');
 
 const { log } = Apify.utils;
+const googleDomains = require('./google-domains.json');
 
 function checkAndEval(extendOutputFunction) {
     let evaledFunc;
@@ -41,13 +42,8 @@ async function applyFunction($, evaledFunc, items) {
 }
 
 function countryCodeToGoogleHostname(countryCode) {
-    const suffix = countryCode.toLowerCase();
-    switch (suffix) {
-        case 'us':
-            return 'www.google.com';
-        default:
-            return `www.google.${suffix}`;
-    }
+    const suffix = countryCode.toUpperCase();
+    return googleDomains[suffix];
 }
 
 function makeRequestList(queries, inputUrl, countryCode) {
@@ -56,8 +52,8 @@ function makeRequestList(queries, inputUrl, countryCode) {
 
     if (!inputUrl) {
         sources = queries.map((query) => {
-            const url = `http://${hostname}/search?q=${encodeURIComponent(query)}&tbm=shop&tbs=vw:l`;
-    
+            const url = `http://www.${hostname}/search?q=${encodeURIComponent(query)}&tbm=shop&tbs=vw:l`;
+
             return new Apify.Request({
                 url,
                 userData: {
@@ -67,16 +63,18 @@ function makeRequestList(queries, inputUrl, countryCode) {
                 },
             });
         });
-    }
-    
-    else {
+    } else {
         sources = inputUrl.map((searchUrl) => {
             // URL has to start with plain http for SERP proxy to work
             let url = searchUrl;
             if (url.startsWith('https')) {
                 url = url.replace('https', 'http');
             }
-    
+
+            if (url.startsWith('http://google')) {
+                url = url.replace('http://google', 'http://www.google');
+            }
+
             return new Apify.Request({
                 url,
                 userData: {

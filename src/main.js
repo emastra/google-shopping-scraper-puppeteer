@@ -1,4 +1,5 @@
 const Apify = require('apify');
+
 const { log, sleep } = Apify.utils;
 
 const {
@@ -23,12 +24,8 @@ Apify.main(async () => {
         extendOutputFunction = null,
     } = input;
 
-    if (!countryCode) {
-        throw new Error('Country is required');
-    }
-
-    if (!queries && !inputUrl) {
-        throw new Error('At least "Search Queries" or "Input URL" must be provided');
+    if (!(queries && countryCode) && !inputUrl) {
+        throw new Error('At least "Search Queries & countryCode" or "Input URL" must be provided');
     }
 
     // Prepare the initial list of google shopping queries and request queue
@@ -42,11 +39,9 @@ Apify.main(async () => {
     let evaledFunc;
     if (extendOutputFunction) evaledFunc = checkAndEval(extendOutputFunction);
 
-    // prepare SERP proxy url and useragent
-    const password = process.env.APIFY_PROXY_PASSWORD;
-    const proxyUrl = `http://groups-GOOGLE_SERP:${password}@proxy.apify.com:8000`;
-    const userAgent = proxyUrl ? Apify.utils.getRandomUserAgent() : undefined;
-
+    const proxyConfiguration = await Apify.createProxyConfiguration({
+        groups: ['GOOGLE_SERP'],
+    });
 
     // crawler config
     const crawler = new Apify.PuppeteerCrawler({
@@ -55,19 +50,16 @@ Apify.main(async () => {
         maxRequestRetries: 3,
         handlePageTimeoutSecs: 240,
         maxConcurrency: 20,
+        proxyConfiguration,
         launchPuppeteerOptions: {
-            proxyUrl: proxyUrl,
-            userAgent: userAgent,
             timeout: 120 * 1000,
             headless: true,
-            useChrome: true
         },
-
         gotoFunction: async ({ request, page }) => {
-          return page.goto(request.url, {
-            timeout: 180 * 1000,
-            waitUntil: 'load' // networkidle2
-          });
+            return page.goto(request.url, {
+                timeout: 180 * 1000,
+                waitUntil: 'load',
+            });
         },
 
         handlePageFunction: async ({ page, request, response, puppeteerPool, autoscaledPool, session, proxyInfo }) => {
@@ -75,11 +67,17 @@ Apify.main(async () => {
             const { label, query, hostname } = request.userData;
 
             if (label === 'SEARCH-PAGE') {
-                await page.waitForSelector('div.sh-pr__product-results');
-                let resultsLength = await page.evaluate(() => {
+                try {
+                    await page.waitForSelector('div.sh-pr__product-results');
+                } catch (e) {
+                    const html = await page.content();
+                    await Apify.setValue(`ERROR-PAGE-${Math.random()}`, html, { contentType: 'text/html' });
+                    throw `Page didn't load properly, retrying...`;
+                }
+                const resultsLength = await page.evaluate(() => {
                     return document.querySelector('div.sh-pr__product-results').children.length;
                 });
-                
+
                 log.info(`Processing "${query}" - found ${resultsLength} products`);
 
                 // check HTML if page has no results
@@ -101,7 +99,7 @@ Apify.main(async () => {
                     }
 
                     const data = [];
-                    
+
                     for (let i = 0; i < results.length; i++) {
                         const item = results[i];
 
@@ -150,7 +148,7 @@ Apify.main(async () => {
                             positionOnSearchPage: i + 1,
                             productDetails: null,
                         };
-                
+
                         data.push(output);
                     }
 
@@ -178,15 +176,13 @@ Apify.main(async () => {
                         }
                     }
 
+                    // TODO: Not sure why is this commented, fix it
                     // if extended output fnction exists, apply it now.
                     // if (evaledFunc) item = await applyFunction($, evaledFunc, item);
 
                     await Apify.pushData(item);
                     log.info(`${item.productName} item pushed.`);
                 }
-
-                // slow down scraping to avoid being blocked by google
-                await sleep(1000);
             }
 
             // if (label === 'DETAIL_PAGE') {
@@ -215,7 +211,7 @@ Apify.main(async () => {
             //                     currentSeller.sellerName = td.innerText.split('\n')[0];
             //                     currentSeller.sellerLink = td.querySelector('a').href;
             //                 }
-                            
+
             //                 if (z === 2) {
             //                     td = tds[z];
             //                     currentSeller.sellerPrice = td.innerText;
@@ -224,7 +220,7 @@ Apify.main(async () => {
 
             //             data.push(currentSeller);
             //         }
-                    
+
             //         return data;
             //     });
 
