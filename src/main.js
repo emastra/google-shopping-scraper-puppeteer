@@ -53,19 +53,15 @@ Apify.main(async () => {
         proxyConfiguration,
         launchContext: {
             launchOptions: {
-                headless: true,
-                waitUntil: 'domcontentloaded',
+                waitUntil: 'load',
             },
             useChrome: true,
             stealth: true,
         },
-        gotoFunction: async ({ request, page }) => {
-            return page.goto(request.url, {
-                timeout: 180 * 1000,
-                waitUntil: 'load',
-            });
-        },
-
+        preNavigationHooks: [async ({}, gotoOptions) => { 
+            gotoOptions.waitUntil = 'load';
+            gotoOptions.timeout = 18000;
+          }],
         handlePageFunction: async ({ page, request, response, puppeteerPool, autoscaledPool, session, proxyInfo }) => {
             log.info('Processing: ' + request.url);
             const { label, query, hostname } = request.userData;
@@ -143,7 +139,7 @@ Apify.main(async () => {
                             reviewsScore,
                             reviewsCount,
                             positionOnSearchPage: i + 1,
-                            productDetails: null,
+                            productDetails: item.querySelectorAll('.translate-content')[1].textContent.trim(),
                         };
 
                         data.push(output);
