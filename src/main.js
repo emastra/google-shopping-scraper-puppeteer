@@ -51,17 +51,17 @@ Apify.main(async () => {
         handlePageTimeoutSecs: 240,
         maxConcurrency: 20,
         proxyConfiguration,
-        launchPuppeteerOptions: {
-            timeout: 120 * 1000,
-            headless: true,
-        },
-        gotoFunction: async ({ request, page }) => {
-            return page.goto(request.url, {
-                timeout: 180 * 1000,
+        launchContext: {
+            launchOptions: {
                 waitUntil: 'load',
-            });
+            },
+            useChrome: true,
+            stealth: true,
         },
-
+        preNavigationHooks: [async ({}, gotoOptions) => { 
+            gotoOptions.waitUntil = 'load';
+            gotoOptions.timeout = 18000;
+          }],
         handlePageFunction: async ({ page, request, response, puppeteerPool, autoscaledPool, session, proxyInfo }) => {
             log.info('Processing: ' + request.url);
             const { label, query, hostname } = request.userData;
@@ -88,11 +88,8 @@ Apify.main(async () => {
                         '#debug': Apify.utils.createRequestDebugInfo(request),
                     });
                 }
-
                 const data = await page.evaluate((maxPostCount, query) => {
-                    let results = Array.from(document.querySelector('div.sh-pr__product-results').children);
-                    results = results.filter(item => item.classList.contains('sh-dlr__list-result'));
-
+                    let results = Array.from(document.querySelectorAll('.sh-dlr__list-result'));
                     // limit the results to be scraped, if maxPostCount exists
                     if (maxPostCount) {
                         results = results.slice(0, maxPostCount);
@@ -101,6 +98,7 @@ Apify.main(async () => {
                     const data = [];
 
                     for (let i = 0; i < results.length; i++) {
+                        // Please pay attention that "merchantMetrics" and "reviewsLink" were removed from the  "SEARCH" page.
                         const item = results[i];
 
                         const title = item.querySelector('h3');
@@ -108,29 +106,24 @@ Apify.main(async () => {
 
                         const productLinkAnchor = item.querySelector('a[href*="shopping/product/"]');
                         const productLink = productLinkAnchor ? productLinkAnchor.href : null;
-
-                        const priceTag = item.querySelector('span.h1Wfwb');
-                        const priceSpan = priceTag.querySelector('span[aria-hidden="true"]');
-                        const price = priceSpan ? priceSpan.textContent : null;
+                        const price = item.querySelector('div[data-sh-or="price"] div > span > span')
+                        ? item.querySelector('div[data-sh-or="price"] div > span > span').textContent : null;
 
                         let description = item.querySelectorAll('div.hBUZL')[1].textContent;
 
-                        const merchantAnchor = item.querySelector('a[class*=merchant-name]');
-                        const merchantName = merchantAnchor ? merchantAnchor.textContent : '';
+                        const merchantName = item.querySelector('div[data-sh-or="price"]').nextSibling ? item.querySelector('div[data-sh-or="price"]').nextSibling.textContent : null;
 
-                        const merchantMetricsAnchor = item.querySelector('a[href*="shopping/ratings/account/metrics"]');
-                        let merchantMetrics = merchantMetricsAnchor ? merchantMetricsAnchor.textContent : '';
+                        // const merchantMetricsAnchor = item.querySelector('a[href*="shopping/ratings/account/metrics"]');
+                        // let merchantMetrics = merchantMetricsAnchor ? merchantMetricsAnchor.textContent : '';
 
-                        let merchantLink = merchantAnchor ? merchantAnchor.href : '';
+                        let merchantLink = item.querySelector('div[data-sh-or="price"]').parentElement.parentElement.href;
 
                         const idArray = productLink ? productLink.split('?')[0].split('/') : null;
                         let shoppingId = idArray ? idArray[idArray.length - 1] : null;
 
-                        const reviewsElement = item.querySelector('a[href$="#reviews"]');
-                        let reviewsLink = reviewsElement ? reviewsElement.href : null;
-                        const scoreElement = reviewsElement ? reviewsElement.querySelector('span div[aria-label]') : null;
-                        let reviewsScore = scoreElement ? scoreElement.attributes['aria-label'].nodeValue : null;
-                        let reviewsCount = reviewsElement ? reviewsElement.querySelector('span[aria-label]').textContent : null;
+                        // let reviewsLink = reviewsElement ? reviewsElement.href : null;
+                        let reviewsScore = item.querySelector('div[aria-label*="product reviews"]') ? item.querySelector('div[aria-label*="product reviews"] span').textContent : null;
+                        let reviewsCount = item.querySelector('div[aria-label*="product reviews"]') ? item.querySelector('div[aria-label*="product reviews"]').getAttribute('aria-label').split(' ')[0] : null;
 
                         const output = {
                             query,
@@ -139,14 +132,14 @@ Apify.main(async () => {
                             price,
                             description,
                             merchantName,
-                            merchantMetrics,
+                            // merchantMetrics,
                             merchantLink,
                             shoppingId,
-                            reviewsLink,
+                            // reviewsLink, 
                             reviewsScore,
                             reviewsCount,
                             positionOnSearchPage: i + 1,
-                            productDetails: null,
+                            productDetails: item.querySelectorAll('.translate-content')[1].textContent.trim(),
                         };
 
                         data.push(output);

@@ -3,3 +3,4 @@ node_modules
 src/BU
 *.tar.gz
 apify_storage
+package-lock.json
