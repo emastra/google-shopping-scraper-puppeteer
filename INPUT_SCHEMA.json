@@ -14,7 +14,7 @@
             "title": "Input URL",
             "type": "array",
             "description": "(Required if you don't use 'Search Queries') Here you can provide a list of search URLs.",
-            "editor": "stringList"
+            "editor": "requestListSources"
         },
         "countryCode": {
             "title": "Country",
@@ -511,13 +511,6 @@
             "description": "Limit of the results to be scraped per page (0 means no limit)",
             "minimum": 0,
             "default": 0
-        },
-        "isAdvancedResults": {
-            "title": "Is Advanced Results",
-            "type": "boolean",
-            "editor": "checkbox",
-            "description": "Check it if you want more data into your results",
-            "default": true
         },
         "extendOutputFunction": {
             "title": "Extend output function",
