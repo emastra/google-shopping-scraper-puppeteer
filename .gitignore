@@ -4,3 +4,4 @@ src/BU
 *.tar.gz
 apify_storage
 package-lock.json
+.idea
