@@ -5,8 +5,8 @@ const googleDomains = require('./google-domains.json');
 
 function checkAndEval(extendOutputFunction) {
     let evaledFunc;
-
     try {
+        // eslint-disable-next-line no-eval
         evaledFunc = eval(extendOutputFunction);
     } catch (e) {
         throw new Error(`extendOutputFunction is not a valid JavaScript! Error: ${e}`);
@@ -30,14 +30,14 @@ async function applyFunction(page, extendOutputFunction, item) {
             const result = await fn($);
             return { result };
         } catch (e) {
-            return { error: e.toString()} ;
+            return { error: e.toString() };
         }
     };
 
     await Apify.utils.puppeteer.injectJQuery(page);
     const { result, error } = await page.evaluate(evaluatePageFunction, pageFunctionString);
     if (error) {
-        console.log(`extendOutputFunctionfailed. Returning default output. Error: ${error}`);
+        log.info(`extendOutputFunctionfailed. Returning default output. Error: ${error}`);
         return item;
     }
 
@@ -54,7 +54,7 @@ function countryCodeToGoogleHostname(countryCode) {
     return googleDomains[suffix];
 }
 
-function makeRequestList(queries, inputUrl, countryCode) {
+async function makeRequestList(queries, inputUrl, countryCode) {
     const hostname = countryCodeToGoogleHostname(countryCode);
     let sources;
 
@@ -65,16 +65,22 @@ function makeRequestList(queries, inputUrl, countryCode) {
             return new Apify.Request({
                 url,
                 userData: {
-                    label: 'SEARCH-PAGE',
+                    label: 'SEARCH_PAGE',
                     query,
                     hostname,
+                    savedItems: 0,
+                    pageNumber: 1,
                 },
             });
         });
     } else {
-        sources = inputUrl.map((searchUrl) => {
+        const startUrls = [];
+        for await (const req of fromStartUrls(inputUrl)) {
+            startUrls.push(req);
+        }
+        sources = startUrls.map((startUrl) => {
             // URL has to start with plain http for SERP proxy to work
-            let url = searchUrl;
+            let { url } = startUrl;
             if (url.startsWith('https')) {
                 url = url.replace('https', 'http');
             }
@@ -86,19 +92,34 @@ function makeRequestList(queries, inputUrl, countryCode) {
             return new Apify.Request({
                 url,
                 userData: {
-                    label: 'SEARCH-PAGE',
+                    label: 'SEARCH_PAGE',
                     query: url,
                     hostname,
+                    savedItems: 0,
+                    pageNumber: 1,
                 },
             });
         });
     }
-
     return Apify.openRequestList('products', sources);
+}
+
+// FUNCTION TO DEAL WITH ALL TYPES OF START URLS  (EXTERNAL CSV FILE, LOCAL TXT-FILE, NORMAL URL)
+async function* fromStartUrls(startUrls, name = 'STARTURLS') {
+    const rl = await Apify.openRequestList(name, startUrls);
+
+    /** @type {Apify.Request | null} */
+    let rq;
+
+    // eslint-disable-next-line no-cond-assign
+    while (rq = await rl.fetchNextRequest()) {
+        yield rq;
+    }
 }
 
 module.exports = {
     checkAndEval,
     applyFunction,
-    makeRequestList
+    makeRequestList,
+    fromStartUrls,
 };
