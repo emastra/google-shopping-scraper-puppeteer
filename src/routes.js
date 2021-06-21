@@ -46,23 +46,29 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
             // Please pay attention that "merchantMetrics" and "reviewsLink" were removed from the  "SEARCH" page.
             const item = results[i];
             // KEYS OF OUTPUT OBJ
-            const title = item.querySelector('h3');
+            const title = item.querySelector('h3') ? item.querySelector('h3') : null;
             const productName = title ? title.textContent : null;
 
-            const productLinkAnchor = item.querySelector('a[href*="shopping/product/"]');
-            const productLink = productLinkAnchor ? productLinkAnchor.href : null;
+            const productLinkAnchor = item.querySelector('a[href*="shopping/product/"]')
+                ? item.querySelector('a[href*="shopping/product/"]') : null;
+            const productLink = productLinkAnchor
+                ? productLinkAnchor.href : null;
             const price = item.querySelector('div[data-sh-or="price"] div > span > span')
                 ? item.querySelector('div[data-sh-or="price"] div > span > span').textContent : null;
 
-            const description = item.querySelectorAll('div.hBUZL')[1].textContent;
+            const description = item.querySelectorAll('div.hBUZL')[1]
+                ? item.querySelectorAll('div.hBUZL')[1].textContent : null;
 
             const merchantName = item.querySelector('div[data-sh-or="price"]').nextSibling
                 ? item.querySelector('div[data-sh-or="price"]').nextSibling.textContent : null;
 
-            const merchantLink = item.querySelector('div[data-sh-or="price"]').parentElement.parentElement.href;
+            const merchantLink = item.querySelector('div[data-sh-or="price"]').parentElement.parentElement
+                ? item.querySelector('div[data-sh-or="price"]').parentElement.parentElement.href : null;
 
-            const idArray = productLink ? productLink.split('?')[0].split('/') : null;
-            const shoppingId = idArray ? idArray[idArray.length - 1] : null;
+            const idArray = productLink
+                ? productLink.split('?')[0].split('/') : null;
+            const shoppingId = idArray
+                ? idArray[idArray.length - 1] : null;
 
             const reviewsScore = item.querySelector('div[aria-label*="product reviews"]')
                 ? item.querySelector('div[aria-label*="product reviews"] span').textContent : null;
