@@ -9,7 +9,7 @@
             "type": "array",
             "description": "(Required if you don't use 'Input URL') Here you can provide a list of search queries as a Javascript array. This takes precedence over 'Input URL'.",
             "editor": "stringList",
-            "prefilled": "iPhone"
+            "prefill": "iPhone"
         },
         "inputUrl": {
             "title": "Input URL",
