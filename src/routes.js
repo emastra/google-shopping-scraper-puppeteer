@@ -20,8 +20,6 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         return document.querySelector('div.sh-pr__product-results').children.length;
     });
 
-    log.info(`Found ${resultsLength} products on the page.`);
-
     // check HTML if page has no results
     if (resultsLength === 0) {
         log.warning('The page has no results. Check dataset for more info.');
@@ -30,6 +28,11 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
             '#debug': Apify.utils.createRequestDebugInfo(request),
         });
     }
+    // sometimes it loads totally different page. In this case number of items would be > 22. Need to retry.
+    if (resultsLength > 22) {
+        throw new Error('Page didn\'t load properly, retrying...');
+    }
+    log.info(`Found ${resultsLength} products on the page.`);
     // eslint-disable-next-line no-shadow
     const data = await page.evaluate((maxPostCount, query, savedItems) => {
         // nodes with items
