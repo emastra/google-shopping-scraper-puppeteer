@@ -1,3 +1,7 @@
+## 2021-05-26
+*Changes*
+- SDK updated to 2.0.6;
+
 ## 2021-06-21
 *Changes*
 - BREAKING: Changed  editor type for "start URL" field to "requestListSources" in the input.
