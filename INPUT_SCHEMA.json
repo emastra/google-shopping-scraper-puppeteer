@@ -15,7 +15,8 @@
             "title": "Input URL",
             "type": "array",
             "description": "(Required if you don't use 'Search Queries') Here you can provide a list of search URLs.",
-            "editor": "requestListSources"
+            "editor": "requestListSources",
+            "default": "https://www.google.com/search?q=shoes&sxsrf=AOaemvLO4lFaR4BwmZhpYypR3vPLTM7OGw:1639995208269&source=lnms&tbm=shop&sa=X&ved=2ahUKEwiGosmekvL0AhXSTsAKHZpWCj8Q_AUoA3oECAMQBQ&biw=1440&bih=824&dpr=1"
         },
         "countryCode": {
             "title": "Country",

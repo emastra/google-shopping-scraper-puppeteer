@@ -7,15 +7,15 @@ const { log } = Apify.utils;
 
 Apify.main(async () => {
     // For testing
-    // await Apify.setValue('INPUT', {
-    //     // inputUrl: [
-    //     //     {
-    //     //         url: 'https://www.google.com/search?q=shoes&sxsrf=AOaemvLO4lFaR4BwmZhpYypR3vPLTM7OGw:1639995208269&source=lnms&tbm=shop&sa=X&ved=2ahUKEwiGosmekvL0AhXSTsAKHZpWCj8Q_AUoA3oECAMQBQ&biw=1440&bih=824&dpr=1',
-    //     //     },
-    //     // ],
-    //     queries: ['dogs'],
-    //     countryCode: 'us',
-    // });
+    await Apify.setValue('INPUT', {
+        inputUrl: [
+            {
+                url: 'https://www.google.com/search?q=iphone&sxsrf=ALeKk03YE4ebiVtFZfi7AXptM3q6ZgUOrw:1624[…]AzanxAhUxlVwKHQTrBRwQ_AUoAXoECAIQAw&biw=1064&bih=1030&dpr=0.9',
+            },
+        ],
+        // queries: ['dogs'],
+        // countryCode: 'us',
+    });
 
     const input = await Apify.getValue('INPUT');
 
