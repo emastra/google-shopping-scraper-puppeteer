@@ -6,18 +6,23 @@ const { checkAndEval, makeRequestList } = require('./utils');
 const { log } = Apify.utils;
 
 Apify.main(async () => {
+    // For testing
+    // await Apify.setValue('INPUT', {
+    //     // inputUrl: [
+    //     //     {
+    //     //         url: 'https://www.google.com/search?q=shoes&sxsrf=AOaemvLO4lFaR4BwmZhpYypR3vPLTM7OGw:1639995208269&source=lnms&tbm=shop&sa=X&ved=2ahUKEwiGosmekvL0AhXSTsAKHZpWCj8Q_AUoA3oECAMQBQ&biw=1440&bih=824&dpr=1',
+    //     //     },
+    //     // ],
+    //     queries: ['dogs'],
+    //     countryCode: 'us',
+    // });
+
     const input = await Apify.getValue('INPUT');
 
     // Validate the input
     if (!input) throw new Error('Missing configuration');
 
-    const {
-        queries = null,
-        inputUrl = null,
-        countryCode = 'us',
-        maxPostCount,
-        extendOutputFunction = null,
-    } = input;
+    const { queries = null, inputUrl = null, countryCode = 'us', maxPostCount, extendOutputFunction = null } = input;
 
     if (!(queries && countryCode) && !inputUrl) {
         throw new Error('At least "Search Queries & countryCode" or "Input URL" must be provided');
@@ -26,7 +31,7 @@ Apify.main(async () => {
     // Prepare the initial list of google shopping queries and request queue
     const requestList = await makeRequestList(queries, inputUrl, countryCode);
     log.info('Search URLs:');
-    requestList.requests.forEach(r => console.log('  ', r.url));
+    requestList.requests.forEach((r) => console.log('  ', r.url));
 
     const requestQueue = await Apify.openRequestQueue();
 
@@ -52,6 +57,7 @@ Apify.main(async () => {
         launchContext: {
             launchOptions: {
                 waitUntil: 'load',
+                headless: true,
             },
             useChrome: true,
             stealth: true,

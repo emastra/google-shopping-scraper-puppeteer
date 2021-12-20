@@ -20,7 +20,7 @@ function checkAndEval(extendOutputFunction) {
 }
 
 async function applyFunction(page, extendOutputFunction, item) {
-    const isObject = val => typeof val === 'object' && val !== null && !Array.isArray(val);
+    const isObject = (val) => typeof val === 'object' && val !== null && !Array.isArray(val);
 
     const pageFunctionString = extendOutputFunction.toString();
 
@@ -56,7 +56,7 @@ function countryCodeToGoogleHostname(countryCode) {
 
 async function makeRequestList(queries, inputUrl, countryCode) {
     const hostname = countryCodeToGoogleHostname(countryCode);
-    let sources;
+    let sources = [];
 
     if (!inputUrl) {
         sources = queries.map((query) => {
@@ -112,7 +112,7 @@ async function* fromStartUrls(startUrls, name = 'STARTURLS') {
     let rq;
 
     // eslint-disable-next-line no-cond-assign
-    while (rq = await rl.fetchNextRequest()) {
+    while ((rq = await rl.fetchNextRequest())) {
         yield rq;
     }
 }
