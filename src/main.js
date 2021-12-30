@@ -6,17 +6,6 @@ const { checkAndEval, makeRequestList } = require('./utils');
 const { log } = Apify.utils;
 
 Apify.main(async () => {
-    // For testing
-    await Apify.setValue('INPUT', {
-        inputUrl: [
-            {
-                url: 'https://www.google.com/search?q=iphone&sxsrf=ALeKk03YE4ebiVtFZfi7AXptM3q6ZgUOrw:1624[…]AzanxAhUxlVwKHQTrBRwQ_AUoAXoECAIQAw&biw=1064&bih=1030&dpr=0.9',
-            },
-        ],
-        // queries: ['dogs'],
-        // countryCode: 'us',
-    });
-
     const input = await Apify.getValue('INPUT');
 
     // Validate the input
