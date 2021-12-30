@@ -30,10 +30,9 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         });
     }
     // sometimes it loads totally different page. In this case number of items would be > 22. Need to retry.
-    // ^^ It is loading 101 results for me every time. So this is failing every time on my end when searching via URL.
-    // if (resultsLength > 22) {
-    //     throw new Error("Page didn't load properly, retrying...");
-    // }
+    if (resultsLength > 22) {
+        throw new Error("Page didn't load properly, retrying...");
+    }
     log.info(`Found ${resultsLength} products on the page.`);
     // eslint-disable-next-line no-shadow
     const data = await page.evaluate(
@@ -104,7 +103,7 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         savedItems
     );
     // ITERATING ITEMS TO EXTEND WITH USERS FUNCTION
-    for await (let item of data) {
+    for (let item of data) {
         if (evaledFunc) {
             item = await applyFunction(page, evaledFunc, item);
         }

@@ -57,7 +57,7 @@ Apify.main(async () => {
         launchContext: {
             launchOptions: {
                 waitUntil: 'load',
-                headless: true,
+                // headless: true,
             },
             useChrome: true,
             stealth: true,

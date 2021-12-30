@@ -85,7 +85,7 @@ async function makeRequestList(queries, inputUrl, countryCode) {
         for await (const req of fromStartUrls(inputUrl)) {
             // Parse out the keyword from the provided URL and format it into our own URL
             // Why? Selectors seem to be different depending on the TYPE of Google Shopping page you're on
-            const keyword = req.url.split('q=')[1].split('&')[0];
+            const keyword = new URL(req.url).searchParams.get('q');
             const { url } = formUrl(countryCode, keyword);
             startUrls.push({ ...req, url });
         }
