@@ -20,7 +20,7 @@ function checkAndEval(extendOutputFunction) {
 }
 
 async function applyFunction(page, extendOutputFunction, item) {
-    const isObject = val => typeof val === 'object' && val !== null && !Array.isArray(val);
+    const isObject = (val) => typeof val === 'object' && val !== null && !Array.isArray(val);
 
     const pageFunctionString = extendOutputFunction.toString();
 
@@ -54,13 +54,20 @@ function countryCodeToGoogleHostname(countryCode) {
     return googleDomains[suffix];
 }
 
+// New function which forms a URL from countryCode and query params
+function formUrl(countryCode, query) {
+    const hostname = countryCodeToGoogleHostname(countryCode);
+    const url = `http://www.${hostname}/search?q=${encodeURIComponent(query)}&tbm=shop&tbs=vw:l`;
+    return { url, hostname };
+}
+
 async function makeRequestList(queries, inputUrl, countryCode) {
     const hostname = countryCodeToGoogleHostname(countryCode);
-    let sources;
+    let sources = [];
 
     if (!inputUrl) {
         sources = queries.map((query) => {
-            const url = `http://www.${hostname}/search?q=${encodeURIComponent(query)}&tbm=shop&tbs=vw:l`;
+            const { url } = formUrl(countryCode, query);
 
             return new Apify.Request({
                 url,
@@ -76,7 +83,11 @@ async function makeRequestList(queries, inputUrl, countryCode) {
     } else {
         const startUrls = [];
         for await (const req of fromStartUrls(inputUrl)) {
-            startUrls.push(req);
+            // Parse out the keyword from the provided URL and format it into our own URL
+            // Why? Selectors seem to be different depending on the TYPE of Google Shopping page you're on
+            const keyword = new URL(req.url).searchParams.get('q');
+            const { url } = formUrl(countryCode, keyword);
+            startUrls.push({ ...req, url });
         }
         sources = startUrls.map((startUrl) => {
             // URL has to start with plain http for SERP proxy to work
@@ -112,7 +123,7 @@ async function* fromStartUrls(startUrls, name = 'STARTURLS') {
     let rq;
 
     // eslint-disable-next-line no-cond-assign
-    while (rq = await rl.fetchNextRequest()) {
+    while ((rq = await rl.fetchNextRequest())) {
         yield rq;
     }
 }
