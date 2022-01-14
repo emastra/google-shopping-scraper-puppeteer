@@ -15,8 +15,7 @@
             "title": "Input URL",
             "type": "array",
             "description": "(Required if you don't use 'Search Queries') Here you can provide a list of search URLs.",
-            "editor": "requestListSources",
-            "prefill": [{ "url": "https://www.google.com/search?q=shoes&tbm=shop&sa=X" }]
+            "editor": "requestListSources"
         },
         "countryCode": {
             "title": "Country",
