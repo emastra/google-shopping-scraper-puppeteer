@@ -1,4 +1,3 @@
-const { utils } = require('apify');
 const Apify = require('apify');
 
 const {
@@ -7,7 +6,6 @@ const {
 const { applyFunction } = require('./utils');
 
 exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, evaledFunc) => {
-
     // CHECK FOR SELECTOR
     let { savedItems, pageNumber } = request.userData;
     const { hostname } = request.userData;
@@ -18,6 +16,7 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         return document.querySelector('div.sh-pr__product-results').children.length;
     });
 
+
     // check HTML if page has no results
     if (resultsLength === 0) {
         log.warning('The page has no results. Check dataset for more info.');
@@ -26,6 +25,7 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
             '#debug': Apify.utils.createRequestDebugInfo(request),
         });
     }
+
 
     log.info(`Found ${resultsLength} products on the page.`);
     // eslint-disable-next-line no-shadow
@@ -94,7 +94,7 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         },
         maxPostCount,
         query,
-        savedItems
+        savedItems,
     );
     // ITERATING ITEMS TO EXTEND WITH USERS FUNCTION
     for (let item of data) {
@@ -105,7 +105,5 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         await Apify.pushData(item);
         savedItems++;
     }
-    
     log.info(`${Math.min(maxPostCount, resultsLength)} items on the page were successfully scraped.`);
-    
 };

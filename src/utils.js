@@ -20,7 +20,7 @@ function checkAndEval(extendOutputFunction) {
 }
 
 async function applyFunction(page, extendOutputFunction, item) {
-    const isObject = val => typeof val === 'object' && val !== null && !Array.isArray(val);
+    const isObject = (val) => typeof val === 'object' && val !== null && !Array.isArray(val);
 
     const pageFunctionString = extendOutputFunction.toString();
 
