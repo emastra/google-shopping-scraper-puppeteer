@@ -1,3 +1,4 @@
+const { utils } = require('apify');
 const Apify = require('apify');
 
 const {
@@ -6,17 +7,13 @@ const {
 const { applyFunction } = require('./utils');
 
 exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, evaledFunc) => {
+
     // CHECK FOR SELECTOR
     let { savedItems, pageNumber } = request.userData;
     const { hostname } = request.userData;
-    try {
-        await page.waitForSelector('div.sh-pr__product-results');
-    } catch (e) {
-        const html = await page.content();
-        await Apify.setValue(`ERROR-PAGE-${Math.random()}`, html, { contentType: 'text/html' });
-        throw new Error("Page didn't load properly, retrying...");
-    }
-    // GETTING NUMBER OF RESULTS
+
+    await page.waitForSelector('div.sh-pr__product-results');
+
     const resultsLength = await page.evaluate(() => {
         return document.querySelector('div.sh-pr__product-results').children.length;
     });
@@ -29,10 +26,7 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
             '#debug': Apify.utils.createRequestDebugInfo(request),
         });
     }
-    // sometimes it loads totally different page. In this case number of items would be > 22. Need to retry.
-    if (resultsLength > 22) {
-        throw new Error("Page didn't load properly, retrying...");
-    }
+
     log.info(`Found ${resultsLength} products on the page.`);
     // eslint-disable-next-line no-shadow
     const data = await page.evaluate(
@@ -111,7 +105,8 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
         await Apify.pushData(item);
         savedItems++;
     }
-    log.info('All items from the page were successfully saved.');
+    
+    log.info(`${Math.min(maxPostCount, resultsLength)} items on the page were successfully scraped.`);
 
     // COMMENTED PART ABOUT PAGINATION:
     // IT DOESN'T WORK PROPERLY (SHOWS DIFFERENT LOCATION + OFTEN FAILS TO LOAD). NEED TO DIVE DEEPER

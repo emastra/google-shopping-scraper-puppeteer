@@ -20,7 +20,7 @@ Apify.main(async () => {
     // Prepare the initial list of google shopping queries and request queue
     const requestList = await makeRequestList(queries, inputUrl, countryCode);
     log.info('Search URLs:');
-    requestList.requests.forEach((r) => console.log('  ', r.url));
+    requestList.requests.forEach(r => console.log('  ', r.url));
 
     const requestQueue = await Apify.openRequestQueue();
 
@@ -45,11 +45,8 @@ Apify.main(async () => {
         proxyConfiguration,
         launchContext: {
             launchOptions: {
-                waitUntil: 'load',
-                // headless: true,
+                headless: true,
             },
-            useChrome: true,
-            stealth: true,
         },
         handlePageFunction: async ({ page, request }) => {
             log.info(`Processing: ${request.url}`);
