@@ -1,91 +1,40 @@
-# Google Shopping Scraper
-Google Shopping Scraper is an [Apify actor](https://apify.com/actors) for extracting data from [Google Shopping](https://www.google.com/shopping) web site, in any country domain. It scrapes the first result page and details about each product and its sellers. It is build on top of [Apify SDK](https://sdk.apify.com/) and you can run it both on [Apify platform](https://my.apify.com) and locally.
+## What does Google Shopping Scraper do?
+Google Shopping Scraper will enable you to extract product data from Google Shopping under any country domain. It scrapes the first result page and details about each product and its sellers. It is built on top of the open-source Apify SDK and you can run it both on the Apify platform and locally.
 
-- [Input](#input)
-- [Output](#output)
-- [Google SERP](#google-serp)
-- [Expected CU consumption](#expected-cu-consumption)
-- [Extend output function](#extend-output-function)
-- [Open an issue](#open-an-issue)
+Google Shopping Scraper can scrape:
+- product name
+- product price
+- product details
+- product reviews
 
-### Input
+## Why scrape Google Shopping?
+Google Shopping is a great source of data for basically any industry. From clothes to tech, it's a great place to extract data for market research and price monitoring.
 
-| Field | Type | Description |
-| ----- | ---- | ----------- |
-| queries | Array of Strings | (Required if you don't use `inputUrl`) List of queries to search for |
-| inputUrl | Array of Strings | (Required if you don't use `queries`) Here you can provide a list of search URLs. |
-| countryCode | String | (required) Provide the country to search in (choose from the country list when using the editor, provide the country code when using JSON) |
-| maxPostCount | Integer | Limit of the results to be scraped per page, 0 means no limit. Currently the actor scrapes only the 1st page (20 results) |
-| isAdvancedResults | Boolean | Check this if you want to scrape more data. Your dataset items will have more fields including `merchantName` and `reviews` |
-| extendOutputFunction | string | Function that takes a JQuery handle ($) as argument and returns data that will be merged with the default output. More information in [Extend output function](#extend-output-function) |
+Here are just some of the ways you could use that data:
+- **market research**: see what products are on the market, and analyze them to discover how to market your own products. Find out who your competitors are and make sure there is a market for your product.
+- **price monitoring**: find the perfect deal by regularly extracting prices. See how your competitors how pricing their products and create your own winning dynamic pricing strategy.
+- **product research**: if you're waiting for a product to be available again, scrape regularly to be the first to know as soon as you can purchase it, or get insights into what's on the market so you can develop your own products.
 
-INPUT Example:
 
-```
-{
-  "queries": [
-    "iphone 11 pro"
-  ],
-  "countryCode": "US",
-  "maxPostCount": 10,
-  "isAdvancedResults": true
-}
-```
+If you would like more inspiration on how scraping Google Shopping could help your business or organization, check out our [industry pages](https://apify.com/industries).
 
-### Output
+## How to scrape Google Shopping
+It's easy to scrape [Google Shopping](https://shopping.google.com/) with Google Shopping Scraper. Just follow these few steps and you'll get your data in a few minutes.
 
-Output is stored in a dataset.
-Example of one output item:
-```
-{
-  "query": "iphone 11 pro",
-  "productName": "Apple iPhone 11 Pro - 64 GB - Space Gray - Unlocked - CDMA/GSM",
-  "productLink": "http://www.google.com/shopping/product/7412086993790421270?q=iphone+11+pro&hl=en&gl=us&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw&prds=epd:12986884032099345386,prmr:1&sa=X&ved=0ahUKEwiVxNfskdTqAhVmTRUIHZZBByMQ8gII0QQ",
-  "price": "$999.00",
-  "description": "5,453 product reviews",
-  "merchantName": "Apple",
-  "merchantMetrics": "93% positive seller rating",
-  "merchantLink": "http://www.google.com/aclk?sa=L&ai=DChcSEwiRydvskdTqAhWF7u0KHbFVAVsYABAEGgJkZw&sig=AOD64_3XQE0ANMdXdV-A13_3UoAq7QojIA&ctype=5&q=&ved=0ahUKEwiVxNfskdTqAhVmTRUIHZZBByMQg-UECNME&adurl=",
-  "shoppingId": "7412086993790421270",
-  "reviewsLink": "http://www.google.com/shopping/product/7412086993790421270?q=iphone+11+pro&hl=en&gl=us&uule=w+CAIQICINVW5pdGVkIFN0YXRlcw&prds=epd:12986884032099345386,prmr:1&sa=X&ved=0ahUKEwiVxNfskdTqAhVmTRUIHZZBByMQ9AII1gQ#reviews",
-  "reviewsScore": "4.7 out of 5 stars",
-  "reviewsCount": "5,453 product reviews",
-  "positionOnSearchPage": 2,
-  "productDetails": null
-},
-```
+1. Click on Try for free.
+2. Enter the keywords or search terms you want to scrape. Or enter a URL to start scraping.
+3. Click on Start.
+4. When Google Shopping Scraper has finished, preview or download your data from the Dataset tab.
 
-*Note about price format*
-- Different countries has different price formats, currently the actor leaves the price format as it is found on the page.
+## How much will it cost to scrape Google Shopping Scraper?
+Apify gives you $5 free usage credits every month on the Apify Free plan. You can get 50,000 results per month from Google Shopping Scraper for that, so those 50k results will be completely free!
 
-*Note about the results*
-- Google results are affected by your internet history. The results from the scraper might differ from the results in your browser.
+But if you need to get more data regularly from Google Shopping, you should grab an [Apify subscription](https://apify.com/pricing). We recommend our $49/month Personal plan - you can get up to 500k every month with the $49 monthly plan! 
 
-### Google SERP
-The actor uses Google SERP Proxy to scrape localized results. For more information, check the [documentation](https://docs.apify.com/proxy/google-serp-proxy).
+Or get 5 million results for $499 with the Team plan - wow!
 
-### Extend output function
+## Tips for scraping Google Shopping
+Here's a tip for scraping Google Shopping. If you want to filter your search by product details (price range, color, model, etc), head over to the Google Shopping website in a separate browser window, type your keyboard into the search bar, and toggle with the filters. Once you are done, copy the web page's URL, and paste it into the scraper's input field!
 
-You can use this function to update the default output of this actor. This function gets a JQuery handle `$` as an argument so you can choose what data from the page you want to scrape. The output from this will function will get merged with the default output.
-
-The **return value** of this function has to be an **object**!
-
-You can return fields to achieve 3 different things:
-- Add a new field - Return object with a field that is not in the default output
-- Change a field - Return an existing field with a new value
-- Remove a field - Return an existing field with a value `undefined`
-
-The following example will add a new field:
-```
-($) => {
-    return {
-        comment: 'This is a comment',
-    }
-}
-```
-
-### Expected CU consumption
-Expected compute units is 0.394 every 10 products.
-
-### Open an issue
-If you find any bug, please create an issue on the actor [Github page](https://github.com/emastra/google-shopping-scraper-puppeteer).
+## Is it legal to scrape Google Shopping?
+Web scraping is legal but you should be aware that personal data is protected by GDPR in the European Union and by other regulations around the world. You should not scrape personal data unless you have a legitimate reason to do so. If you're unsure whether your reason is legitimate, consult your lawyers. We also recommend that you read our blog post: [is web scraping legal?](https://blog.apify.com/is-web-scraping-legal/)
