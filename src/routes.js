@@ -66,10 +66,10 @@ exports.SEARCH_PAGE = async (page, request, query, requestQueue, maxPostCount, e
                 const idArray = productLink ? productLink.split('?')[0].split('/') : null;
                 const shoppingId = idArray ? idArray[idArray.length - 1] : null;
 
-                const reviewsScore = item.querySelector('div[aria-label*="product reviews"] span')?.textContent ?? null;
-                const reviewsCount = item.querySelector('div[aria-label*="product reviews"]')
-                    ? item.querySelector('div[aria-label*="product reviews"]').getAttribute('aria-label').split(' ')[0]
-                    : null;
+                const reviewInfo = item.querySelector('div[aria-label*=","]') ? item.querySelector('div[aria-label*=","]').getAttribute('aria-label') : null;
+
+                const reviewsScore = item.querySelector('div[aria-label*=","]')?.textContent?.slice(0,3) ?? null;
+                const reviewsCount = reviewInfo ? reviewInfo.split(' ')[0] : null;
 
                 // FINAL OUTPUT OBJ
                 const output = {
